@@ -4,12 +4,14 @@ const API = axios.create({
   baseURL: "https://notewise-6hs6.onrender.com",
 });
 
-API.interceptors.request.use((config) => {
+// Automatically attach token to each request
+API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`; 
+    req.headers.authToken = token;
   }
-  return config;
+  return req;
 });
 
 export default API;
+
