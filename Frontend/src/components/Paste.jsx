@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from "../api/axios";
 
 import {
@@ -19,17 +19,36 @@ const Paste = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [summarizingNoteId, setSummarizingNoteId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login first");
+      navigate("/login");
+      return;
+    }
     fetchNotes();
   }, []);
 
   const fetchNotes = async () => {
     try {
-      const res = await API.get("/notes");
-      setNotes(res.data);
-    } catch {
+      const res = await API.get("/notes", {
+        headers: { authToken: localStorage.getItem("token") },
+      });
+      const data = res.data;
+      console.log("✅ Notes Response:", data);
+      if (Array.isArray(data)) {
+        setNotes(data);
+      } else {
+        console.error("❌ Invalid data from server:", data);
+        toast.error("Unexpected response from server");
+        setNotes([]);
+      }
+    } catch (err) {
+      console.error("❌ Error loading notes:", err);
       toast.error("Failed to load notes");
+      setNotes([]);
     }
   };
 
@@ -91,17 +110,23 @@ const Paste = () => {
     }
   };
 
-  const filteredData = notes
-    .filter(
-      (note) =>
-        note.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        (categoryFilter === "All" || note.category === categoryFilter)
-    )
-    .sort((a, b) => b.pinned - a.pinned);
+  const filteredData = Array.isArray(notes)
+    ? notes
+        .filter(
+          (note) =>
+            note.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+            (categoryFilter === "All" || note.category === categoryFilter)
+        )
+        .sort((a, b) => b.pinned - a.pinned)
+    : [];
 
   const uniqueCategories = [
     "All",
-    ...new Set(notes.map((n) => n.category || "Uncategorized")),
+    ...new Set(
+      (Array.isArray(notes) ? notes : []).map(
+        (n) => n.category || "Uncategorized"
+      )
+    ),
   ];
 
   return (
@@ -238,3 +263,4 @@ const Paste = () => {
 };
 
 export default Paste;
+
