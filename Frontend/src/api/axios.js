@@ -1,12 +1,10 @@
-// src/api/axios.js
 import axios from "axios";
 
-const instance = axios.create({
-  baseURL: "https://notewise-6hs6.onrender.com/api", // ✅ use deployed backend URL
+const API = axios.create({
+  baseURL: "https://notewise-6hs6.onrender.com/api", 
 });
 
-// Add auth token to every request
-instance.interceptors.request.use((config) => {
+API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -14,6 +12,4 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-export default instance;
-
-
+export default API;
