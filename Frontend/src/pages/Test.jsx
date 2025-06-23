@@ -8,6 +8,7 @@ const Test = () => {
   const [selected, setSelected] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [score, setScore] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const Test = () => {
     const combined = selectedNotes.map((n) => n.content).join("\n");
 
     try {
+      setLoading(true);
       const res = await API.post("/ai/generate-mcq", { content: combined });
       const formattedQuestions = res.data.questions.map((q) => ({
         ...q,
@@ -41,6 +43,8 @@ const Test = () => {
       setScore(null);
     } catch {
       toast.error("❌ Failed to generate test");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -92,10 +96,16 @@ const Test = () => {
           <div className="flex gap-3 justify-center">
             <button
               onClick={generateTest}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow transition"
+              disabled={loading}
+              className={`px-6 py-2 rounded shadow ${
+                loading
+                  ? "bg-gray-400 text-white cursor-wait"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
             >
-              🎯 Generate Test
+              {loading ? "⏳ Generating Test..." : "🎯 Generate Test"}
             </button>
+
             <button
               onClick={() => navigate("/pastes")}
               className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded transition"
@@ -107,42 +117,70 @@ const Test = () => {
       ) : (
         <>
           <div className="space-y-6">
-            {questions.map((q, idx) => (
-              <div
-                key={idx}
-                className="p-4 border rounded-xl bg-white dark:bg-gray-800 shadow"
-              >
-                <p className="font-semibold mb-2">
-                  {idx + 1}. {q.question}
-                </p>
-                <div className="space-y-2">
-                  {q.options.map((opt, oIdx) => (
-                    <label key={oIdx} className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name={`q-${idx}`}
-                        value={opt.option}
-                        onChange={() => {
-                          const updated = [...questions];
-                          updated[idx].selected = opt.option;
-                          setQuestions(updated);
-                        }}
-                        className="h-4 w-4"
-                      />
-                      <span>{opt.option}</span>
-                    </label>
-                  ))}
+            {questions.map((q, idx) => {
+              const correctOption = q.options.find((opt) => opt.correct)?.option;
+
+              return (
+                <div
+                  key={idx}
+                  className="p-4 border rounded-xl bg-white dark:bg-gray-800 shadow"
+                >
+                  <p className="font-semibold mb-2">
+                    {idx + 1}. {q.question}
+                  </p>
+                  <div className="space-y-2">
+                    {q.options.map((opt, oIdx) => {
+                      const isCorrect = opt.option === correctOption;
+                      const isSelected = opt.option === q.selected;
+
+                      const baseClasses =
+                        "px-3 py-2 rounded transition block w-full text-left";
+
+                      const bgClass =
+                        score !== null
+                          ? isCorrect
+                            ? "bg-green-100 text-green-800 border border-green-400"
+                            : isSelected
+                            ? "bg-red-100 text-red-800 border border-red-400"
+                            : "bg-gray-100"
+                          : "bg-gray-100";
+
+                      return (
+                        <label
+                          key={oIdx}
+                          className={`${baseClasses} ${bgClass}`}
+                        >
+                          <input
+                            type="radio"
+                            name={`q-${idx}`}
+                            value={opt.option}
+                            disabled={score !== null}
+                            checked={q.selected === opt.option}
+                            onChange={() => {
+                              const updated = [...questions];
+                              updated[idx].selected = opt.option;
+                              setQuestions(updated);
+                            }}
+                            className="mr-2"
+                          />
+                          {opt.option}{" "}
+                          {score !== null &&
+                            (isCorrect ? "✔️" : isSelected ? "❌" : "")}
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="text-center mt-6">
             <button
               onClick={handleSubmit}
-              disabled={!allAnswered}
+              disabled={!allAnswered || score !== null}
               className={`px-6 py-2 rounded shadow ${
-                allAnswered
+                allAnswered && score === null
                   ? "bg-green-600 hover:bg-green-700 text-white"
                   : "bg-gray-400 text-white cursor-not-allowed"
               }`}
@@ -172,3 +210,4 @@ const Test = () => {
 };
 
 export default Test;
+
