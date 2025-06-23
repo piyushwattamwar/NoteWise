@@ -16,6 +16,6 @@ export const protect = async (req, res, next) => {
       return res.status(401).json({ message: "Invalid token" });
     }
   } else {
-    return res.status(401).json({ message: "No token" });
+    return res.status(401).json({ message: "Please Login!!" });
   }
 };
