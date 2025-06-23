@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import API from "../api/axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom"; 
-const navigate = useNavigate();
 
 const Home = () => {
   const [title, setTitle] = useState("");
@@ -13,34 +11,29 @@ const Home = () => {
 
   // ✅ Create Note
   
-  const createNote = async () => {
-  if (!title.trim() || !value.trim()) {
-    return toast.error("Title and Content are required!");
-  }
+ 
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    toast.error("Please login to create a note");
-    navigate("/login");
-    return;
-  }
+   const createNote = async () => {
+    if (!title.trim() || !value.trim()) {
+      return toast.error("Title and Content are required!");
+    }
 
-  try {
-    await API.post("/notes", {
-      title,
-      content: value,
-      category: category || "Uncategorized",
-    });
+    try {
+      await API.post("/notes", {
+        title,
+        content: value,
+        category: category || "Uncategorized",
+      });
 
-    toast.success("✅ Note saved successfully!");
-    setTitle("");
-    setValue("");
-    setCategory("");
-  } catch (err) {
-    console.error(err.response?.data || err);
-    toast.error(err.response?.data?.message || "❌ Failed to save note");
-  }
-};
+      toast.success("✅ Note saved successfully!");
+      setTitle("");
+      setValue("");
+      setCategory("");
+    } catch (err) {
+      console.error(err.response?.data || err);
+      toast.error(err.response?.data?.message || "❌ Failed to save note");
+    }
+  };
 
   // ✅ Suggest Title
   const suggestTitle = async () => {
