@@ -10,6 +10,7 @@ const Register = () => {
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -18,6 +19,7 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       const res = await axios.post(
@@ -26,11 +28,13 @@ const Register = () => {
       );
 
       toast.success("🎉 Registration successful! Please login.");
-      navigate("/login"); // ✅ redirect to login after successful registration
+      navigate("/login");
     } catch (error) {
       const message =
         error.response?.data?.message || "Registration failed. Try again.";
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,9 +84,14 @@ const Register = () => {
 
           <button
             type="submit"
-            className="bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
+            disabled={loading}
+            className={`py-2 rounded transition ${
+              loading
+                ? "bg-gray-400 text-white cursor-not-allowed"
+                : "bg-green-600 text-white hover:bg-green-700"
+            }`}
           >
-            Register
+            {loading ? "⏳ Registering..." : "Register"}
           </button>
         </form>
 
