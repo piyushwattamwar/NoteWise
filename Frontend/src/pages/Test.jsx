@@ -142,27 +142,27 @@ const Test = () => {
                           : "bg-gray-100 text-black dark:text-white";
 
                       return (
-                        <label
-                          key={oIdx}
-                          className={`flex items-center gap-2 px-3 py-2 rounded w-full ${bgClass}`}
-                        >
-                          <input
-                            type="radio"
-                            name={`q-${idx}`}
-                            value={opt.option}
-                            disabled={score !== null}
-                            checked={q.selected === opt.option}
-                            onChange={() => {
-                              const updated = [...questions];
-                              updated[idx].selected = opt.option;
-                              setQuestions(updated);
-                            }}
-                            className="h-4 w-4"
-                          />
-                          <span className="text-sm">{opt.option}</span>
-                          {score !== null &&
-                            (isCorrect ? "✔️" : isSelected ? "❌" : "")}
-                        </label>
+                       <label
+  key={oIdx}
+  className={`flex items-center gap-3 px-4 py-2 rounded-md border w-full text-sm font-medium cursor-pointer ${bgClass}`}
+>
+  <input
+    type="radio"
+    name={`q-${idx}`}
+    value={opt.option}
+    disabled={score !== null}
+    checked={q.selected === opt.option}
+    onChange={() => {
+      const updated = [...questions];
+      updated[idx].selected = opt.option;
+      setQuestions(updated);
+    }}
+    className="h-4 w-4"
+  />
+  <span className="flex-1">{opt.option}</span>
+  {score !== null && (isCorrect ? "✔️" : isSelected ? "❌" : "")}
+</label>
+
                       );
                     })}
                   </div>
