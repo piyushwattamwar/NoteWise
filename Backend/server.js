@@ -46,8 +46,9 @@ app.get("/api/ping", (req, res) => {
 
 // Root Route
 app.get("/", (req, res) => {
-  res.send("Welcome to the NoteWise API 🚀");
+  res.json({ message: "Welcome to the NoteWise API 🚀" });
 });
+
 
 // Start Server
 const PORT = process.env.PORT || 5000;
