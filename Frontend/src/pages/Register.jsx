@@ -25,13 +25,8 @@ const Register = () => {
         formData
       );
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-        toast.success("Registration successful!");
-        navigate("/pastes");
-      } else {
-        toast.error("Registration failed: No token received.");
-      }
+      toast.success("🎉 Registration successful! Please login.");
+      navigate("/login"); // ✅ redirect to login after successful registration
     } catch (error) {
       const message =
         error.response?.data?.message || "Registration failed. Try again.";
