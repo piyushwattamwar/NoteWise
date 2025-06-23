@@ -1,27 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
-import Test from "./pages/Test"; 
-import {
-  createBrowserRouter,
-  RouterProvider,
-  Navigate,
-} from "react-router-dom";
-import Footer from "./components/Footer";
-import EditNote from "./pages/EditNote";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import Home from "./components/Home";
-import Profile from "./pages/Profile";
-import Register from "./pages/Register"; 
 import Paste from "./components/Paste";
 import ViewPaste from "./components/ViewPaste";
-import About from "./components/About";
+import EditNote from "./pages/EditNote";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Profile from "./pages/Profile";
 import Help from "./components/Help";
-import Login from "./pages/Login"; 
+import About from "./components/About";
+import Test from "./pages/Test";
 
+// 🔐 Auth Protection
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   return token ? children : <Navigate to="/login" replace />;
 };
+
+// 🧩 Common Layout
+const Layout = ({ children, isDark, setIsDark }) => (
+  <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white transition">
+    <Navbar isDark={isDark} setIsDark={setIsDark} />
+    {children}
+    <Footer />
+  </div>
+);
 
 function App() {
   const [isDark, setIsDark] = useState(() => {
@@ -38,68 +44,40 @@ function App() {
     }
   }, [isDark]);
 
-  const Layout = ({ children }) => (
-    <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white transition">
-      <Navbar isDark={isDark} setIsDark={setIsDark} />
-      {children}
-      <Footer />
-    </div>
-  );
-
   const router = createBrowserRouter([
     {
       path: "/",
-      element: (
-        <Layout>
-          <Home />
-        </Layout>
-      ),
+      element: <Layout isDark={isDark} setIsDark={setIsDark}><Home /></Layout>,
     },
-
+    {
+      path: "/register",
+      element: <Layout isDark={isDark} setIsDark={setIsDark}><Register /></Layout>,
+    },
+    {
+      path: "/login",
+      element: <Layout isDark={isDark} setIsDark={setIsDark}><Login /></Layout>,
+    },
+    {
+      path: "/about",
+      element: <Layout isDark={isDark} setIsDark={setIsDark}><About /></Layout>,
+    },
+    {
+      path: "/help",
+      element: <Layout isDark={isDark} setIsDark={setIsDark}><Help /></Layout>,
+    },
     {
       path: "/profile",
       element: (
         <ProtectedRoute>
-          <Layout>
-            <Profile />
-          </Layout>
+          <Layout isDark={isDark} setIsDark={setIsDark}><Profile /></Layout>
         </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/edit/:id",
-      element: (
-        <ProtectedRoute>
-          <Layout>
-            <EditNote />
-          </Layout>
-        </ProtectedRoute>
-      ),
-    },
-    {
-      path: "/register",
-      element: (
-        <Layout>
-          <Register />
-        </Layout>
-      ),
-    },
-
-    {
-      path: "/login",
-      element: (
-        <Layout>
-          <Login />
-        </Layout>
       ),
     },
     {
       path: "/pastes",
       element: (
         <ProtectedRoute>
-          <Layout>
-            <Paste />
-          </Layout>
+          <Layout isDark={isDark} setIsDark={setIsDark}><Paste /></Layout>
         </ProtectedRoute>
       ),
     },
@@ -107,34 +85,24 @@ function App() {
       path: "/pastes/:id",
       element: (
         <ProtectedRoute>
-          <Layout>
-            <ViewPaste />
-          </Layout>
+          <Layout isDark={isDark} setIsDark={setIsDark}><ViewPaste /></Layout>
         </ProtectedRoute>
       ),
     },
     {
-      path: "/about",
+      path: "/edit/:id",
       element: (
-        <Layout>
-          <About />
-        </Layout>
-      ),
-    },
-    {
-      path: "/help",
-      element: (
-        <Layout>
-          <Help />
-        </Layout>
+        <ProtectedRoute>
+          <Layout isDark={isDark} setIsDark={setIsDark}><EditNote /></Layout>
+        </ProtectedRoute>
       ),
     },
     {
       path: "/test",
       element: (
-        <Layout>
-          <Test />
-        </Layout>
+        <ProtectedRoute>
+          <Layout isDark={isDark} setIsDark={setIsDark}><Test /></Layout>
+        </ProtectedRoute>
       ),
     },
   ]);
@@ -143,3 +111,4 @@ function App() {
 }
 
 export default App;
+
