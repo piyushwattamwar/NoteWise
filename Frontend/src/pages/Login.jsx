@@ -7,10 +7,12 @@ import { FaLock, FaEnvelope } from "react-icons/fa";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true); 
     try {
       const res = await axios.post("https://notewise-6hs6.onrender.com/api/auth/login", {
         email,
@@ -28,6 +30,8 @@ const Login = () => {
       const message =
         error.response?.data?.message || "Login failed. Try again.";
       toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,9 +68,14 @@ const Login = () => {
 
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            disabled={loading}
+            className={`py-2 rounded transition text-white ${
+              loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
-            Login
+            {loading ? "⏳ Logging in..." : "Login"}
           </button>
         </form>
 
@@ -82,3 +91,4 @@ const Login = () => {
 };
 
 export default Login;
+
