@@ -27,7 +27,6 @@
   - Pie chart for note categories
   - Bar chart for daily note activity
   - Test score trends
-- 🌓 **Dark Mode**
 - 💡 **Responsive Design** (Mobile & Desktop)
 
 ---
